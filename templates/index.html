@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Audio Converter</title>
+    <style>
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; 
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .checkmark {
+            color: green;
+            font-size: 50px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a PDF File</h1>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".pdf" required>
+            <button type="submit">Convert to Audio</button>
+        </form>
+        <div class="loader" id="loader"></div>
+        <div class="checkmark" id="checkmark">✓</div>
+        <p id="message" style="display: none;">Your audio file is being created! Download will start shortly.</p>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault(); 
+
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('uploadForm').style.display = 'none';
+
+            const formData = new FormData(this);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('checkmark').style.display = 'block';
+                    document.getElementById('message').style.display = 'block';
+
+                    setTimeout(() => {
+                        document.getElementById('checkmark').style.display = 'none';
+                        document.getElementById('message').style.display = 'none';
+                        document.getElementById('uploadForm').style.display = 'block';
+                        document.getElementById('uploadForm').reset(); 
+                    }, 3000);
+                } else {
+                    alert('Error processing the file. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>
